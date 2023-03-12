@@ -1,0 +1,104 @@
+package parser;
+import java_cup.runtime.*;
+
+parser code
+{:
+  public int node_count = 1;
+  public void syntax_error(Symbol s){
+    System.out.println("Error recuperabe de sintaxis: "+ s.value +" en linea "+(s.left+1)+", columna "+(s.right+1) );
+  }
+
+  public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+    System.out.println("Error no recuperabe de sintaxis: "+ s.value +" en linea "+(s.left+1)+", columna "+(s.right+1) );
+  }
+:}
+
+terminal String LBRACKET, SEPARATOR, RBRACKET;
+terminal String CONJ, COLON, IDENTIFIER, ARROW, SEMICOLON;
+terminal String TILDE, COMMA;
+terminal String LOWERC, UPPERC, NUMBER, ASCII;
+terminal String UNION, CONCAT, OPTION, ITERATION, KLEENE;
+terminal String NEWLINE, QUOTES, APOSTROPHE, STRING;
+
+non terminal beginning, instruction;
+non terminal define_set;
+non terminal expression;
+non terminal groups, charRange, list, alphabet;
+non terminal regex, define_setCall, tests, test;
+
+start with beginning;
+
+beginning ::= LBRACKET instruction SEPARATOR SEPARATOR tests RBRACKET
+  ;
+
+instruction ::= instruction define_set
+  | define_set
+  | instruction expression
+  | expression
+  ;
+
+alphabet ::= LOWERC
+  | UPPERC
+  | NUMBER
+  | ASCII
+  | STRING
+  | define_setCall
+  | QUOTES
+  | APOSTROPHE
+  | NEWLINE
+  | error
+  ;
+
+define_setCall ::= LBRACKET IDENTIFIER RBRACKET
+  | error IDENTIFIER RBRACKET
+  | LBRACKET IDENTIFIER error
+  | LBRACKET error RBRACKET
+  ;
+
+define_set ::= CONJ COLON IDENTIFIER ARROW groups SEMICOLON
+  ;
+
+groups ::= charRange
+  | list
+  ;
+
+charRange ::= LOWERC TILDE LOWERC
+  | UPPERC TILDE UPPERC
+  | NUMBER TILDE NUMBER
+  ;
+
+list ::= list alphabet COMMA
+  | alphabet
+  ;
+
+expression ::= IDENTIFIER ARROW regex SEMICOLON {:
+    node_count = 1;
+  :}
+  ;
+
+regex ::= UNION:n regex:a regex:b {:
+    arbol.nodo(n);
+    n.izq(a);
+    n.der(b);
+  :}
+  | CONCAT regex regex
+  | OPTION regex
+  | ITERATION regex
+  | KLEENE:n regex:a {:
+    arbol.nodo(n);
+    n.anulable();
+  :}
+  | alphabet:a {:
+    arbol.nodo(a);
+    a.identificador(node_count);
+    node_count++;
+    RESULT=a
+  :}
+  ;
+
+tests ::= tests test
+  | test
+  ;
+
+test ::= IDENTIFIER COLON STRING SEMICOLON
+  ;
