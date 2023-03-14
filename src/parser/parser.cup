@@ -1,9 +1,15 @@
 package parser;
 import java_cup.runtime.*;
+import exregan.lib.RegexNode;
+import exregan.lib.Dstate;
+import java.util.LinkedList;
+import java.util.HashMap;
 
 parser code
 {:
-  public int node_count = 1;
+  int idCount = 1;
+  HashMap<Integer, LinkedList> nextTable = new HashMap<Integer, LinkedList>();
+  LinkedList<Dstate> dStates = new LinkedList<>();
   public void syntax_error(Symbol s){
     System.out.println("Error recuperabe de sintaxis: "+ s.value +" en linea "+(s.left+1)+", columna "+(s.right+1) );
   }
@@ -14,91 +20,217 @@ parser code
 :}
 
 terminal String LBRACKET, SEPARATOR, RBRACKET;
-terminal String CONJ, COLON, IDENTIFIER, ARROW, SEMICOLON;
+terminal String CONJ, COLON, IDENTIFIER, HYPHEN, GREATER, SEMICOLON;
 terminal String TILDE, COMMA;
 terminal String LOWERC, UPPERC, NUMBER, ASCII;
 terminal String UNION, CONCAT, OPTION, ITERATION, KLEENE;
 terminal String NEWLINE, QUOTES, APOSTROPHE, STRING;
 
 non terminal beginning, instruction;
-non terminal define_set;
+non terminal defineSet;
 non terminal expression;
 non terminal groups, charRange, list, alphabet;
-non terminal regex, define_setCall, tests, test;
+non terminal regex, setCall, tests, test;
 
 start with beginning;
 
-beginning ::= LBRACKET instruction SEPARATOR SEPARATOR tests RBRACKET
+beginning ::= 
+    LBRACKET instruction SEPARATOR SEPARATOR tests RBRACKET
   ;
 
-instruction ::= instruction define_set
-  | define_set
+instruction ::= 
+    instruction defineSet
+  | defineSet
   | instruction expression
   | expression
   ;
 
-alphabet ::= LOWERC
+alphabet ::= 
+    LOWERC
   | UPPERC
   | NUMBER
   | ASCII
   | STRING
-  | define_setCall
   | QUOTES
   | APOSTROPHE
   | NEWLINE
   | error
   ;
 
-define_setCall ::= LBRACKET IDENTIFIER RBRACKET
-  | error IDENTIFIER RBRACKET
-  | LBRACKET IDENTIFIER error
-  | LBRACKET error RBRACKET
+setCall ::= 
+    LBRACKET IDENTIFIER:id RBRACKET
+    {:
+      String identifier = "{"+id+"}";
+      RESULT = identifier; 
+    :}
   ;
 
-define_set ::= CONJ COLON IDENTIFIER ARROW groups SEMICOLON
+defineSet ::= 
+    CONJ COLON IDENTIFIER HYPHEN GREATER groups SEMICOLON
   ;
 
-groups ::= charRange
+groups ::= 
+    charRange
   | list
   ;
 
-charRange ::= LOWERC TILDE LOWERC
+charRange ::=
+    LOWERC TILDE LOWERC
   | UPPERC TILDE UPPERC
   | NUMBER TILDE NUMBER
   ;
 
-list ::= list alphabet COMMA
+list ::=
+    list alphabet COMMA
   | alphabet
   ;
 
-expression ::= IDENTIFIER ARROW regex SEMICOLON {:
-    node_count = 1;
-  :}
+expression ::=
+    IDENTIFIER:idRegex HYPHEN GREATER regex:a SEMICOLON
+    {:
+      RegexNode re = (RegexNode)a;
+      RegexNode extension = new RegexNode("#", idCount, null, null);
+      extension.isNull = false;
+      extension.first.add(idCount);
+      extension.last.add(idCount);
+      RegexNode root = new RegexNode(".", 0, re, extension);
+      root.isNull = false;
+      root.first.addAll(re.first);
+      if (re.isNull){
+        root.first.addAll(extension.first);
+      }
+      root.last.addAll(extension.last);
+
+      //Resetear almacenamiento temporal
+      idCount = 1;
+      nextTable.clear();
+      dStates.clear();
+    :}
   ;
 
-regex ::= UNION:n regex:a regex:b {:
-    arbol.nodo(n);
-    n.izq(a);
-    n.der(b);
-  :}
-  | CONCAT regex regex
-  | OPTION regex
-  | ITERATION regex
-  | KLEENE:n regex:a {:
-    arbol.nodo(n);
-    n.anulable();
-  :}
-  | alphabet:a {:
-    arbol.nodo(a);
-    a.identificador(node_count);
-    node_count++;
-    RESULT=a
-  :}
+regex ::=
+    UNION:n regex:a regex:b
+    {:
+      RegexNode lchild = (RegexNode)a;
+      RegexNode rchild = (RegexNode)b;
+      RegexNode node = new RegexNode(n, 0, lchild, rchild);
+      if (lchild.isNull || rchild.isNull){
+        node.isNull = true;
+      }
+      node.first.addAll(lchild.first);
+      node.first.addAll(rchild.first);
+      node.last.addAll(lchild.last);
+      node.last.addAll(rchild.last);
+      RESULT = node;
+    :}
+  | CONCAT:n regex:a regex:b
+    {:
+      RegexNode lchild = (RegexNode)a;
+      RegexNode rchild = (RegexNode)b;
+      RegexNode node = new RegexNode(n, 0, lchild, rchild);
+      if (lchild.isNull && rchild.isNull){
+        node.isNull = true;
+      }
+      node.first.addAll(lchild.first);
+      if (lchild.isNull){
+        node.first.addAll(rchild.first);
+      }
+      node.last.addAll(rchild.last);
+      if (rchild.isNull){
+        node.last.addAll(lchild.last);
+      }
+      LinkedList nextList;
+      for (int position : lchild.last){
+        if (!nextTable.containsKey(position)){
+          nextTable.put(position, new LinkedList<Integer>());
+        }
+        nextList = nextTable.get(position);
+        for (int value : rchild.first) {
+          if (!nextList.contains(value)){
+            nextList.add(value);
+          }
+        }
+      }
+      RESULT = node;
+    :}
+  | OPTION:n regex:a
+    {:
+      RegexNode child = (RegexNode)a;
+      RegexNode node = new RegexNode(n, 0, child, null);
+      node.isNull = true;
+      node.first.addAll(child.first);
+      node.last.addAll(child.last);
+      RESULT = node;
+    :}
+  | ITERATION:n regex:a
+    {:
+      RegexNode child = (RegexNode)a;
+      RegexNode node = new RegexNode(n, 0, child, null);
+      if (child.isNull){
+        node.isNull = true;
+      }
+      node.first.addAll(child.first);
+      node.last.addAll(child.last);
+      LinkedList nextList;
+      for (int position : child.last){
+        if (!nextTable.containsKey(position)){
+          nextTable.put(position, new LinkedList<Integer>());
+        }
+        nextList = nextTable.get(position);
+        for (int value : child.first) {
+          if (!nextList.contains(value)){
+            nextList.add(value);
+          }
+        }
+      }
+      RESULT = node;
+    :}
+  | KLEENE:n regex:a
+    {:
+      RegexNode child = (RegexNode)a;
+      RegexNode node = new RegexNode(n, 0, child, null);
+      node.isNull = true;
+      node.first.addAll(child.first);
+      node.last.addAll(child.last);
+      LinkedList nextList;
+      for (int position : child.last){
+        if (!nextTable.containsKey(position)){
+          nextTable.put(position, new LinkedList<Integer>());
+        }
+        nextList = nextTable.get(position);
+        for (int value : child.first) {
+          if (!nextList.contains(value)){
+            nextList.add(value);
+          }
+        }
+      }
+      RESULT = node;
+    :}
+  | alphabet:n
+    {:
+      RegexNode node = new RegexNode((String)n, idCount, null, null);
+      idCount++;
+      node.isNull = false;
+      node.first.add(idCount);
+      node.last.add(idCount);
+      RESULT = node;
+    :}
+  | setCall:n
+    {:
+      RegexNode node = new RegexNode((String)n, idCount, null, null);
+      idCount++;
+      node.isNull = false;
+      node.first.add(idCount);
+      node.last.add(idCount);
+      RESULT = node;
+    :}
   ;
 
-tests ::= tests test
+tests ::= 
+    tests test
   | test
   ;
 
-test ::= IDENTIFIER COLON STRING SEMICOLON
+test ::= 
+    IDENTIFIER COLON STRING SEMICOLON
   ;

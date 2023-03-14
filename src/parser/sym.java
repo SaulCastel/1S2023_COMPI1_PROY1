@@ -8,31 +8,32 @@ package parser;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int OPTION = 18;
-  public static final int SEMICOLON = 9;
-  public static final int QUOTES = 22;
-  public static final int UPPERC = 13;
+  public static final int OPTION = 19;
+  public static final int SEMICOLON = 10;
+  public static final int QUOTES = 23;
+  public static final int UPPERC = 14;
   public static final int IDENTIFIER = 7;
-  public static final int CONCAT = 17;
+  public static final int CONCAT = 18;
+  public static final int GREATER = 9;
   public static final int SEPARATOR = 3;
   public static final int LBRACKET = 2;
   public static final int COLON = 6;
   public static final int RBRACKET = 4;
-  public static final int TILDE = 10;
-  public static final int KLEENE = 20;
-  public static final int STRING = 24;
-  public static final int LOWERC = 12;
-  public static final int COMMA = 11;
+  public static final int TILDE = 11;
+  public static final int KLEENE = 21;
+  public static final int STRING = 25;
+  public static final int LOWERC = 13;
+  public static final int COMMA = 12;
   public static final int EOF = 0;
-  public static final int NUMBER = 14;
+  public static final int NUMBER = 15;
   public static final int CONJ = 5;
-  public static final int UNION = 16;
-  public static final int NEWLINE = 21;
+  public static final int UNION = 17;
+  public static final int HYPHEN = 8;
+  public static final int NEWLINE = 22;
   public static final int error = 1;
-  public static final int ARROW = 8;
-  public static final int ITERATION = 19;
-  public static final int ASCII = 15;
-  public static final int APOSTROPHE = 23;
+  public static final int ITERATION = 20;
+  public static final int ASCII = 16;
+  public static final int APOSTROPHE = 24;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -42,7 +43,8 @@ public class sym {
   "CONJ",
   "COLON",
   "IDENTIFIER",
-  "ARROW",
+  "HYPHEN",
+  "GREATER",
   "SEMICOLON",
   "TILDE",
   "COMMA",

@@ -3,7 +3,7 @@ import java_cup.runtime.Symbol;
 
 %%
 
-%class scanner
+%class Scanner
 %cup
 %public
 %line
@@ -18,57 +18,60 @@ import java_cup.runtime.Symbol;
 
 %{
   private Symbol ssymbol(int type){
+      System.out.println(yytext());
       return new Symbol(type, yyline, yycolumn, yytext());
   }
 %}
 
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
-WhiteSpace     = {LineTerminator} | [ \t\f]
+WhiteSpace     = [ \t\f]
 SingleComment = "//" {InputCharacter}* {LineTerminator}?
 MultiComment = "<!" [^!] ~"!>"
 Comment = {SingleComment}|{MultiComment}
-String = [\"]([^\"\n]|[^\\\"])[\"]
-Identifier = [a-zA-Z]["_"0-9A-Za-z]*
+String = [\"]([^\"\n]|[^\\\"])*[\"]
+// Identifier = [a-zA-Z]["_"0-9A-Za-z]*
+Identifier = ([a-zA-Z]|[0-9]|_)+
 NewLine = (\\n)
 Apostrophe = (\\')
 Quotes  =(\\\")
 LowerCase = [a-z]
 UpperCase = [A-Z]
 Number = [0-9]+
-Ascii = [\32 - 125]
+Ascii = [\32-\125]
 
 %%
 
 <YYINITIAL> {
-    "CONJ"          {return ssymbol(sym.CONJ);} 
-    ":"             {return ssymbol(sym.COLON);}
-    "->"            {return ssymbol(sym.ARROW);}
-    ";"             {return ssymbol(sym.SEMICOLON);}
-    "%%"            {return ssymbol(sym.SEPARATOR);}
-    "{"             {return ssymbol(sym.LBRACKET);}
-    "}"             {return ssymbol(sym.RBRACKET);}
-    "~"             {return ssymbol(sym.TILDE);}
-    ","             {return ssymbol(sym.COMMA);}
+    {WhiteSpace}      {}
+    {Comment}         {}    
+    {LineTerminator}  {yycolumn = 1;}
+    "CONJ"            {return ssymbol(sym.CONJ);} 
+    ":"               {return ssymbol(sym.COLON);}
+    "-"               {return ssymbol(sym.HYPHEN);}
+    ">"               {return ssymbol(sym.GREATER);}
+    ";"               {return ssymbol(sym.SEMICOLON);}
+    "%%"              {return ssymbol(sym.SEPARATOR);}
+    "{"               {return ssymbol(sym.LBRACKET);}
+    "}"               {return ssymbol(sym.RBRACKET);}
+    "~"               {return ssymbol(sym.TILDE);}
+    ","               {return ssymbol(sym.COMMA);}
 
-    "+"             {return ssymbol(sym.ITERATION);}
-    "*"             {return ssymbol(sym.KLEENE);}
-    "."             {return ssymbol(sym.CONCAT);}
-    "|"             {return ssymbol(sym.UNION);}
-    "?"             {return ssymbol(sym.OPTION);}
+    "+"               {return ssymbol(sym.ITERATION);}
+    "*"               {return ssymbol(sym.KLEENE);}
+    "."               {return ssymbol(sym.CONCAT);}
+    "|"               {return ssymbol(sym.UNION);}
+    "?"               {return ssymbol(sym.OPTION);}
 
-    {LowerCase}     {return ssymbol(sym.LOWERC);}
-    {UpperCase}     {return ssymbol(sym.UPPERC);}
-    {Number}        {return ssymbol(sym.NUMBER);}
-    {Ascii}         {return ssymbol(sym.ASCII);}
-    {Identifier}    {return ssymbol(sym.IDENTIFIER);}
-    {Comment}       {}
-    {WhiteSpace}    {}
-    {Quotes}   {return ssymbol(sym.QUOTES);}
-    {Apostrophe}    {return ssymbol(sym.APOSTROPHE);}
-    {NewLine}       {return ssymbol(sym.NEWLINE);}
-    \n              {yycolumn = 1;}
-    {String}        {return ssymbol(sym.STRING);}
+    {LowerCase}       {return ssymbol(sym.LOWERC);}
+    {UpperCase}       {return ssymbol(sym.UPPERC);}
+    {Number}          {return ssymbol(sym.NUMBER);}
+    {Identifier}      {return ssymbol(sym.IDENTIFIER);}
+    {Quotes}          {return ssymbol(sym.QUOTES);}
+    {Apostrophe}      {return ssymbol(sym.APOSTROPHE);}
+    {NewLine}         {return ssymbol(sym.NEWLINE);}
+    {String}          {return ssymbol(sym.STRING);}
+    {Ascii}           {return ssymbol(sym.ASCII);}
 }
 
-.                   {throw new Error("Illegal columnacter <"+yytext()+"> at ("+yyline+", "+yycolumn+")");}
+.                     {throw new Error("Illegal character: "+yytext()+" at ("+yyline+", "+yycolumn+")");}
