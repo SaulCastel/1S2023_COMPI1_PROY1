@@ -6,7 +6,7 @@
 package parser;
 
 import java_cup.runtime.*;
-import exregan.lib.RegexNode;
+import exregan.lib.*;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java_cup.runtime.XMLElement;
@@ -230,7 +230,11 @@ public class Parser extends java_cup.runtime.lr_parser {
 
 
   int idCount = 1;
-  HashMap<Integer, LinkedList> nextTable = new HashMap<Integer, LinkedList>();
+  HashMap<Integer, String> symbols = new HashMap<>();
+  HashMap<Integer, LinkedList> nextTable = new HashMap<>();
+  LinkedList<Dstate> dStates = new LinkedList<>();
+  HashMap<String, FSM> automata = new HashMap<>();
+
   public void syntax_error(Symbol s){
     System.out.println("Error recuperabe de sintaxis: "+ s.value +" en linea "+(s.left+1)+", columna "+(s.right+1) );
   }
@@ -327,7 +331,12 @@ class CUP$Parser$actions {
           case 6: // alphabet ::= LOWERC 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -336,7 +345,12 @@ class CUP$Parser$actions {
           case 7: // alphabet ::= UPPERC 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -345,7 +359,12 @@ class CUP$Parser$actions {
           case 8: // alphabet ::= NUMBER 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -354,7 +373,12 @@ class CUP$Parser$actions {
           case 9: // alphabet ::= ASCII 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -363,7 +387,12 @@ class CUP$Parser$actions {
           case 10: // alphabet ::= STRING 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -372,7 +401,12 @@ class CUP$Parser$actions {
           case 11: // alphabet ::= QUOTES 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -381,7 +415,12 @@ class CUP$Parser$actions {
           case 12: // alphabet ::= APOSTROPHE 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -390,7 +429,12 @@ class CUP$Parser$actions {
           case 13: // alphabet ::= NEWLINE 
             {
               Object RESULT =null;
-
+		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		
+      RESULT = str;
+    
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
@@ -507,6 +551,7 @@ class CUP$Parser$actions {
       extension.isNull = false;
       extension.first.add(idCount);
       extension.last.add(idCount);
+      symbols.put(idCount, "#");
       RegexNode root = new RegexNode(".", 0, re, extension);
       root.isNull = false;
       root.first.addAll(re.first);
@@ -514,10 +559,16 @@ class CUP$Parser$actions {
         root.first.addAll(extension.first);
       }
       root.last.addAll(extension.last);
+      FiniteStateMachine generator = new FiniteStateMachine();
+      FSM fsm = generator.getFSM(symbols, nextTable, re.first, idCount);
+      automata.put(idRegex, fsm);
 
       //Resetear almacenamiento temporal
       idCount = 1;
+      symbols.clear();
       nextTable.clear();
+      dStates.clear();
+      System.out.println("Procesamiento de regex terminado");
     
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -699,7 +750,9 @@ class CUP$Parser$actions {
 		int nright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object n = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
-      RegexNode node = new RegexNode((String)n, idCount, null, null);
+      String symbol = (String)n;
+      RegexNode node = new RegexNode(symbol, idCount, null, null);
+      symbols.put(idCount, symbol);
       idCount++;
       node.isNull = false;
       node.first.add(idCount);
@@ -718,7 +771,9 @@ class CUP$Parser$actions {
 		int nright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object n = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
-      RegexNode node = new RegexNode((String)n, idCount, null, null);
+      String symbol = (String)n;
+      RegexNode node = new RegexNode(symbol, idCount, null, null);
+      symbols.put(idCount, symbol);
       idCount++;
       node.isNull = false;
       node.first.add(idCount);

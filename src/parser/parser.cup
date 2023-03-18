@@ -1,15 +1,17 @@
 package parser;
 import java_cup.runtime.*;
-import exregan.lib.RegexNode;
-import exregan.lib.Dstate;
+import exregan.lib.*;
 import java.util.LinkedList;
 import java.util.HashMap;
 
 parser code
 {:
   int idCount = 1;
-  HashMap<Integer, LinkedList> nextTable = new HashMap<Integer, LinkedList>();
+  HashMap<Integer, String> symbols = new HashMap<>();
+  HashMap<Integer, LinkedList> nextTable = new HashMap<>();
   LinkedList<Dstate> dStates = new LinkedList<>();
+  HashMap<String, FSM> automata = new HashMap<>();
+
   public void syntax_error(Symbol s){
     System.out.println("Error recuperabe de sintaxis: "+ s.value +" en linea "+(s.left+1)+", columna "+(s.right+1) );
   }
@@ -46,14 +48,38 @@ instruction ::=
   ;
 
 alphabet ::= 
-    LOWERC
-  | UPPERC
-  | NUMBER
-  | ASCII
-  | STRING
-  | QUOTES
-  | APOSTROPHE
-  | NEWLINE
+    LOWERC:str
+    {:
+      RESULT = str;
+    :}
+  | UPPERC:str
+    {:
+      RESULT = str;
+    :}
+  | NUMBER:str
+    {:
+      RESULT = str;
+    :}
+  | ASCII:str
+    {:
+      RESULT = str;
+    :}
+  | STRING:str
+    {:
+      RESULT = str;
+    :}
+  | QUOTES:str
+    {:
+      RESULT = str;
+    :}
+  | APOSTROPHE:str
+    {:
+      RESULT = str;
+    :}
+  | NEWLINE:str
+    {:
+      RESULT = str;
+    :}
   | error
   ;
 
@@ -93,6 +119,7 @@ expression ::=
       extension.isNull = false;
       extension.first.add(idCount);
       extension.last.add(idCount);
+      symbols.put(idCount, "#");
       RegexNode root = new RegexNode(".", 0, re, extension);
       root.isNull = false;
       root.first.addAll(re.first);
@@ -100,11 +127,16 @@ expression ::=
         root.first.addAll(extension.first);
       }
       root.last.addAll(extension.last);
+      FiniteStateMachine generator = new FiniteStateMachine();
+      FSM fsm = generator.getFSM(symbols, nextTable, re.first, idCount);
+      automata.put(idRegex, fsm);
 
       //Resetear almacenamiento temporal
       idCount = 1;
+      symbols.clear();
       nextTable.clear();
       dStates.clear();
+      System.out.println("Procesamiento de regex terminado");
     :}
   ;
 
@@ -208,7 +240,9 @@ regex ::=
     :}
   | alphabet:n
     {:
-      RegexNode node = new RegexNode((String)n, idCount, null, null);
+      String symbol = (String)n;
+      RegexNode node = new RegexNode(symbol, idCount, null, null);
+      symbols.put(idCount, symbol);
       idCount++;
       node.isNull = false;
       node.first.add(idCount);
@@ -217,7 +251,9 @@ regex ::=
     :}
   | setCall:n
     {:
-      RegexNode node = new RegexNode((String)n, idCount, null, null);
+      String symbol = (String)n;
+      RegexNode node = new RegexNode(symbol, idCount, null, null);
+      symbols.put(idCount, symbol);
       idCount++;
       node.isNull = false;
       node.first.add(idCount);

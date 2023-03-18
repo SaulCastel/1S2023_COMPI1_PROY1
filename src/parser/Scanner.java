@@ -252,7 +252,7 @@ public class Scanner implements java_cup.runtime.Scanner {
 
   /* user code: */
   private Symbol ssymbol(int type){
-      System.out.println(yytext());
+      //System.out.println(yytext());
       return new Symbol(type, yyline, yycolumn, yytext());
   }
 

@@ -18,7 +18,7 @@ import java_cup.runtime.Symbol;
 
 %{
   private Symbol ssymbol(int type){
-      System.out.println(yytext());
+      //System.out.println(yytext());
       return new Symbol(type, yyline, yycolumn, yytext());
   }
 %}

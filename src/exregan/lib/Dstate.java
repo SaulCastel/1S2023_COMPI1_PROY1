@@ -12,8 +12,14 @@ import java.util.LinkedList;
 public class Dstate {
   public boolean isNew;
   public LinkedList<Integer> list;
+
   public Dstate(){
     this.isNew = true;
     this.list = new LinkedList<>();
+  }
+
+  public Dstate(LinkedList list){
+    this.isNew = true;
+    this.list = list;
   }
 }

@@ -1,0 +1,10 @@
+{
+  <! COMENTARIO
+    MULTILINEA !>
+  CONJ: set -> a~c;
+  regex -> .a.b+{set};
+  %%
+  %%
+  regex: "abc"; // correcta
+  // fin
+}
