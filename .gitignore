@@ -2,3 +2,7 @@ build/
 dist/
 src/parser/*java~
 graphviz/
+ARBOLES_201801178/*
+SIGUIENTES_201801178/*
+TRANSICIONES_201801178/*
+AFD_201801178/*

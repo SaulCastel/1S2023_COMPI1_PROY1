@@ -14,7 +14,7 @@ import java.io.FileReader;
  */
 public class Main {
   public static void main(String args[]){
-    String file = "test_files/media.olc";
+    String file = "test_files/mini.olc";
     try {
       BufferedReader br = new BufferedReader(new FileReader(file));
       Scanner s = new Scanner(br);

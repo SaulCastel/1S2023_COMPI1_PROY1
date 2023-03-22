@@ -229,11 +229,13 @@ public class Parser extends java_cup.runtime.lr_parser {
 
 
 
-  int idCount = 1;
+  int position = 1;
+  int nodeID = 1;
   HashMap<Integer, String> symbols = new HashMap<>();
   HashMap<Integer, LinkedList> nextTable = new HashMap<>();
-  LinkedList<Dstate> dStates = new LinkedList<>();
   HashMap<String, FSM> automata = new HashMap<>();
+  FiniteStateMachine generator = new FiniteStateMachine();
+  Graph graph = new Graph();
 
   public void syntax_error(Symbol s){
     System.out.println("Error recuperabe de sintaxis: "+ s.value +" en linea "+(s.left+1)+", columna "+(s.right+1) );
@@ -547,28 +549,42 @@ class CUP$Parser$actions {
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.elementAt(CUP$Parser$top-1)).value;
 		
       RegexNode re = (RegexNode)a;
-      RegexNode extension = new RegexNode("#", idCount, null, null);
+      RegexNode extension = new RegexNode("#", position, nodeID, null, null);
+      nodeID++;
       extension.isNull = false;
-      extension.first.add(idCount);
-      extension.last.add(idCount);
-      symbols.put(idCount, "#");
-      RegexNode root = new RegexNode(".", 0, re, extension);
+      extension.first.add(position);
+      extension.last.add(position);
+      symbols.put(position, "#");
+      RegexNode root = new RegexNode(".", 0, nodeID, re, extension);
       root.isNull = false;
       root.first.addAll(re.first);
       if (re.isNull){
         root.first.addAll(extension.first);
       }
       root.last.addAll(extension.last);
-      FiniteStateMachine generator = new FiniteStateMachine();
-      FSM fsm = generator.getFSM(symbols, nextTable, re.first, idCount);
+      LinkedList nextList;
+      for (int position : re.last){
+        if (!nextTable.containsKey(position)){
+          nextTable.put(position, new LinkedList<Integer>());
+        }
+        nextList = nextTable.get(position);
+        for (int value : extension.first) {
+          if (!nextList.contains(value)){
+            nextList.add(value);
+          }
+        }
+      }
+      FSM fsm = generator.getFSM(symbols, nextTable, re.first, position);
       automata.put(idRegex, fsm);
-
+      //Generar reportes
+      graph.graphTree(root, idRegex);
+      System.out.println("Reportes generados");
       //Resetear almacenamiento temporal
-      idCount = 1;
+      position = 1;
+      nodeID = 0;
       symbols.clear();
       nextTable.clear();
-      dStates.clear();
-      System.out.println("Procesamiento de regex terminado");
+      System.out.println("Procesamiento de regex terminado: "+idRegex);
     
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",3, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -590,7 +606,8 @@ class CUP$Parser$actions {
 		
       RegexNode lchild = (RegexNode)a;
       RegexNode rchild = (RegexNode)b;
-      RegexNode node = new RegexNode(n, 0, lchild, rchild);
+      RegexNode node = new RegexNode(n, 0, nodeID, lchild, rchild);
+      nodeID++;
       if (lchild.isNull || rchild.isNull){
         node.isNull = true;
       }
@@ -620,7 +637,8 @@ class CUP$Parser$actions {
 		
       RegexNode lchild = (RegexNode)a;
       RegexNode rchild = (RegexNode)b;
-      RegexNode node = new RegexNode(n, 0, lchild, rchild);
+      RegexNode node = new RegexNode(n, 0, nodeID, lchild, rchild);
+      nodeID++;
       if (lchild.isNull && rchild.isNull){
         node.isNull = true;
       }
@@ -662,7 +680,8 @@ class CUP$Parser$actions {
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
       RegexNode child = (RegexNode)a;
-      RegexNode node = new RegexNode(n, 0, child, null);
+      RegexNode node = new RegexNode(n, 0, nodeID, child, null);
+      nodeID++;
       node.isNull = true;
       node.first.addAll(child.first);
       node.last.addAll(child.last);
@@ -684,7 +703,8 @@ class CUP$Parser$actions {
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
       RegexNode child = (RegexNode)a;
-      RegexNode node = new RegexNode(n, 0, child, null);
+      RegexNode node = new RegexNode(n, 0, nodeID, child, null);
+      nodeID++;
       if (child.isNull){
         node.isNull = true;
       }
@@ -720,7 +740,8 @@ class CUP$Parser$actions {
 		Object a = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
       RegexNode child = (RegexNode)a;
-      RegexNode node = new RegexNode(n, 0, child, null);
+      RegexNode node = new RegexNode(n, 0, nodeID, child, null);
+      nodeID++;
       node.isNull = true;
       node.first.addAll(child.first);
       node.last.addAll(child.last);
@@ -751,12 +772,13 @@ class CUP$Parser$actions {
 		Object n = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
       String symbol = (String)n;
-      RegexNode node = new RegexNode(symbol, idCount, null, null);
-      symbols.put(idCount, symbol);
-      idCount++;
+      RegexNode node = new RegexNode(symbol, position, nodeID, null, null);
+      symbols.put(position, symbol);
+      nodeID++;
       node.isNull = false;
-      node.first.add(idCount);
-      node.last.add(idCount);
+      node.first.add(position);
+      node.last.add(position);
+      position++;
       RESULT = node;
     
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("regex",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
@@ -772,12 +794,13 @@ class CUP$Parser$actions {
 		Object n = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
       String symbol = (String)n;
-      RegexNode node = new RegexNode(symbol, idCount, null, null);
-      symbols.put(idCount, symbol);
-      idCount++;
+      RegexNode node = new RegexNode(symbol, position, nodeID, null, null);
+      symbols.put(position, symbol);
+      nodeID++;
       node.isNull = false;
-      node.first.add(idCount);
-      node.last.add(idCount);
+      node.first.add(position);
+      node.last.add(position);
+      position++;
       RESULT = node;
     
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("regex",8, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);

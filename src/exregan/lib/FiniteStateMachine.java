@@ -29,7 +29,8 @@ public class FiniteStateMachine {
     while(dStates.getLast().isNew){
       current.isNew = false;
       for (String symbol : symbols.values()){
-        Dstate newState = this.getPossibleNewState(symbol, symbols, current.list, nextTable);
+        Dstate newState = 
+          this.getPossibleNewState(symbol, symbols, current.list, nextTable, finalIndex);
         destinationState = this.searchStateInTable(newState, dStates);
         if (destinationState == -1){
           dStates.add(newState);
@@ -52,11 +53,12 @@ public class FiniteStateMachine {
       String symbol,
       HashMap<Integer, String> symbols,
       LinkedList<Integer> positions,
-      HashMap<Integer, LinkedList> nextTable
+      HashMap<Integer, LinkedList> nextTable,
+      int finalIndex
     ){
     Dstate union = new Dstate();
     for (int p : positions){
-      if (symbols.get(p).equals(symbol)){
+      if (p != finalIndex && symbols.get(p).equals(symbol)){
         union.list.addAll(nextTable.get(p));
       }
     }

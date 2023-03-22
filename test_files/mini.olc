@@ -2,9 +2,12 @@
   <! COMENTARIO
     MULTILINEA !>
   CONJ: set -> a~c;
-  regex -> .a.b+{set};
+  regex1 -> .a.b?.c.+d*e;
+  regex2 -> .f|g?.h|+i*j;
+  regex3 -> .\"|{set_prueba}.\'+\n;
   %%
   %%
-  regex: "abc"; // correcta
+  regex1: "abcde"; // correcta
+  regex2: "fghij"; // correcta
   // fin
 }
