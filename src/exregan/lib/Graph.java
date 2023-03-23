@@ -6,7 +6,9 @@ package exregan.lib;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Stack;
 
 /**
@@ -32,10 +34,10 @@ public class Graph {
       node = s.pop();
       //Escribir al archivo de texto
       str += String.format("n%s[label=\"", Integer.toString(node.ID));
-      str += ((node.isNull) ? "A" : "N") + "\\n";
-      str += String.format("<%s>\\n", node.symbol);
-      str += String.format("[%s] - ", node.first.toArray());
-      str += String.format("[%s]\\n", node.last.toArray());
+      str += ((node.isNull) ? "A" : "N") + "\n";
+      str += String.format("<%s>\n", node.symbol);
+      str += String.format("%s - ", Arrays.toString(node.first.toArray()));
+      str += String.format("%s\n", Arrays.toString(node.last.toArray()));
       str += (node.position == 0) ? "" : Integer.toString(node.position);
       str += "\"];\n";
       if (node.left != null) {
@@ -84,7 +86,7 @@ public class Graph {
           symbol
         );
         if (automaton.validationStates.contains(destination)) {
-          str += String.format("%d[shape=\"doublecircle\"];\n", destination); 
+          str += String.format("%d[shape=\"doublecircle\"];\n", destination);
         }
       }
       fw.write(str);
@@ -93,6 +95,35 @@ public class Graph {
     fw.write("}");
     fw.close();
     execGraphviz(route, fileName);
+  }
+
+  public void graphNextTable(
+    HashMap<Integer, LinkedList> nextTable,
+    HashMap<Integer, String> symbols,
+    String fileName) throws IOException {
+    String route = "SIGUIENTES_201801178/";
+    String str = "";
+    FileWriter fw
+      = new FileWriter(String.format(route + "%s.dot", fileName));
+    fw.write("digraph G {\n");
+    fw.write("node[shape=plaintext];\n");
+    fw.write("table[label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n");
+    fw.write("<TR><TD COLSPAN=\"2\">Hojas</TD><TD>Siguientes</TD></TR>\n");
+    for (int leaf : nextTable.keySet()) {
+      str += "<TR>\n";
+      str += String.format("<TD>%s</TD>\n", symbols.get(leaf));
+      str += String.format("<TD>%d</TD>\n", leaf);
+      str += String.format(
+        "<TD>%s</TD>\n",
+        Arrays.toString(nextTable.get(leaf).toArray())
+      );
+      str += "</TR>\n";
+      fw.write(str);
+      str = "";
+    }
+    fw.write("</TABLE>>];\n}");
+    fw.close();
+    this.execGraphviz(route, fileName);
   }
 
   private void execGraphviz(String route, String fileName) throws IOException {
@@ -104,5 +135,6 @@ public class Graph {
       "-o",
       route + fileName + ".jpg",};
     rt.exec(cmd);
+    //rt.exec("rm "+cmd[1]);
   }
 }

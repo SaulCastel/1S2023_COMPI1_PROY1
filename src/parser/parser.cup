@@ -68,7 +68,7 @@ alphabet ::=
     :}
   | STRING:str
     {:
-      RESULT = str;
+      RESULT = str.replace("\"", "\\\"");
     :}
   | QUOTES:str
     {:
@@ -147,6 +147,7 @@ expression ::=
       //Generar reportes
       graph.graphTree(root, idRegex);
       graph.graphAFD(fsm, idRegex);
+      graph.graphNextTable(nextTable, symbols, idRegex);
       //Resetear almacenamiento temporal
       position = 1;
       nodeID = 0;

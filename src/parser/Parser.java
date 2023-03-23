@@ -393,7 +393,7 @@ class CUP$Parser$actions {
 		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
-      RESULT = str;
+      RESULT = str.replace("\"", "\\\"");
     
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -576,6 +576,7 @@ class CUP$Parser$actions {
       //Generar reportes
       graph.graphTree(root, idRegex);
       graph.graphAFD(fsm, idRegex);
+      graph.graphNextTable(nextTable, symbols, idRegex);
       //Resetear almacenamiento temporal
       position = 1;
       nodeID = 0;
