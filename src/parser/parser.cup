@@ -78,9 +78,9 @@ alphabet ::=
     {:
       RESULT = str;
     :}
-  | NEWLINE:str
+  | NEWLINE
     {:
-      RESULT = str;
+      RESULT = "nl";
     :}
   | error
   ;
@@ -146,7 +146,7 @@ expression ::=
       automata.put(idRegex, fsm);
       //Generar reportes
       graph.graphTree(root, idRegex);
-      System.out.println("Reportes generados");
+      graph.graphAFD(fsm, idRegex);
       //Resetear almacenamiento temporal
       position = 1;
       nodeID = 0;

@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package exregan.lib;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Arrays;
@@ -12,12 +13,13 @@ import java.util.Arrays;
  * @author saulc
  */
 public class FiniteStateMachine {
+
   public FSM getFSM(
-      HashMap<Integer, String> symbols,
-      HashMap<Integer, LinkedList> nextTable,
-      LinkedList<Integer> firstState,
-      int finalIndex
-    ){
+    HashMap<Integer, String> symbols,
+    HashMap<Integer, LinkedList> nextTable,
+    LinkedList<Integer> firstState,
+    int finalIndex
+  ) {
     int originState = 0;
     int destinationState;
     LinkedList<Integer> validationStates = new LinkedList<>();
@@ -26,50 +28,59 @@ public class FiniteStateMachine {
 
     dStates.add(new Dstate(firstState));
     Dstate current = dStates.getFirst();
-    while(dStates.getLast().isNew){
+    while (dStates.getLast().isNew) {
       current.isNew = false;
-      for (String symbol : symbols.values()){
-        Dstate newState = 
-          this.getPossibleNewState(symbol, symbols, current.list, nextTable, finalIndex);
-        destinationState = this.searchStateInTable(newState, dStates);
-        if (destinationState == -1){
-          dStates.add(newState);
-          destinationState = nextTable.size() - 1;
-          if (newState.list.contains(finalIndex)){
+      Dstate union;
+      for (String symbol : symbols.values()) {
+        union = this.getPossibleNewState(
+          symbol,
+          symbols,
+          current.list,
+          nextTable,
+          finalIndex
+        );
+        if (union == null) {
+          continue;
+        }
+        destinationState = this.searchStateInTable(union, dStates);
+        if (destinationState == -1) {
+          dStates.add(union);
+          destinationState = dStates.size() - 1;
+          if (union.list.contains(finalIndex)) {
             validationStates.add(destinationState);
           }
         }
         this.dTran(transitionTable, originState, symbol, destinationState);
       }
       originState++;
-      if (originState != dStates.size()){
+      if (originState != dStates.size()) {
         current = dStates.get(originState);
       }
     }
-    return new FSM(transitionTable,validationStates);
+    return new FSM(transitionTable, validationStates);
   }
 
   private Dstate getPossibleNewState(
-      String symbol,
-      HashMap<Integer, String> symbols,
-      LinkedList<Integer> positions,
-      HashMap<Integer, LinkedList> nextTable,
-      int finalIndex
-    ){
-    Dstate union = new Dstate();
-    for (int p : positions){
-      if (p != finalIndex && symbols.get(p).equals(symbol)){
-        union.list.addAll(nextTable.get(p));
+    String symbol,
+    HashMap<Integer, String> symbols,
+    LinkedList<Integer> positions,
+    HashMap<Integer, LinkedList> nextTable,
+    int finalIndex
+  ) {
+    LinkedList<Integer> list = new LinkedList<>();
+    for (int p : positions) {
+      if (p != finalIndex && symbols.get(p).equals(symbol)) {
+        list.addAll(nextTable.get(p));
       }
     }
-    return union;
+    return (list.isEmpty()) ? null : new Dstate(list);
   }
 
-  public int searchStateInTable (Dstate state, LinkedList<Dstate> dStates){
+  public int searchStateInTable(Dstate state, LinkedList<Dstate> dStates) {
     int index = 0;
     Object[] newState = state.list.toArray();
-    for (Dstate currState : dStates){
-      if (Arrays.equals(newState, currState.list.toArray())){
+    for (Dstate currState : dStates) {
+      if (Arrays.equals(newState, currState.list.toArray())) {
         return index;
       }
       index++;
@@ -77,17 +88,17 @@ public class FiniteStateMachine {
     return -1;
   }
 
-  private void dTran (
-      HashMap<Integer, HashMap> transitionTable,
-      int origin,
-      String symbol,
-      int destination
-    ){
+  private void dTran(
+    HashMap<Integer, HashMap> transitionTable,
+    int origin,
+    String symbol,
+    int destination
+  ) {
     HashMap<String, Integer> transition = transitionTable.get(origin);
-    if (transition == null){
+    if (transition == null) {
       transition = new HashMap<>();
+      transitionTable.put(origin, transition);
     }
     transition.put(symbol, destination);
-    transitionTable.put(origin, transition); 
   }
 }

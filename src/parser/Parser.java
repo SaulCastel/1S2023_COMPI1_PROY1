@@ -431,11 +431,8 @@ class CUP$Parser$actions {
           case 13: // alphabet ::= NEWLINE 
             {
               Object RESULT =null;
-		int strleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
-		int strright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
-		String str = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
 		
-      RESULT = str;
+      RESULT = "nl";
     
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("alphabet",7, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
@@ -578,7 +575,7 @@ class CUP$Parser$actions {
       automata.put(idRegex, fsm);
       //Generar reportes
       graph.graphTree(root, idRegex);
-      System.out.println("Reportes generados");
+      graph.graphAFD(fsm, idRegex);
       //Resetear almacenamiento temporal
       position = 1;
       nodeID = 0;

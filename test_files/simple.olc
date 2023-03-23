@@ -1,0 +1,10 @@
+{
+  <! COMENTARIO
+    MULTILINEA !>
+  CONJ: set -> a~c;
+  regex1 -> .\'.\"\n;
+  %%
+  %%
+  regex1: "abcde"; // incorrecta
+  // fin
+}
