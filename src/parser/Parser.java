@@ -551,7 +551,6 @@ class CUP$Parser$actions {
       extension.isNull = false;
       extension.first.add(position);
       extension.last.add(position);
-      symbols.put(position, "#");
       RegexNode root = new RegexNode(".", 0, nodeID, re, extension);
       root.isNull = false;
       root.first.addAll(re.first);
@@ -577,6 +576,7 @@ class CUP$Parser$actions {
       graph.graphTree(root, idRegex);
       graph.graphAFD(fsm, idRegex);
       graph.graphNextTable(nextTable, symbols, idRegex);
+      graph.graphTransitionTable(fsm, symbols, idRegex);
       //Resetear almacenamiento temporal
       position = 1;
       nodeID = 0;

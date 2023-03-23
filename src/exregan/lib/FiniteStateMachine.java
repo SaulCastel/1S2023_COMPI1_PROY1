@@ -57,7 +57,7 @@ public class FiniteStateMachine {
         current = dStates.get(originState);
       }
     }
-    return new FSM(transitionTable, validationStates);
+    return new FSM(dStates,transitionTable, validationStates);
   }
 
   private Dstate getPossibleNewState(

@@ -17,8 +17,11 @@ import java.util.Stack;
  */
 public class Graph {
 
+  Runtime rt = Runtime.getRuntime();
+
   public void graphTree(RegexNode root, String fileName) throws IOException {
     String route = "ARBOLES_201801178/";
+    rt.exec("mkdir -p " + route);
     String str = "";
     Stack<RegexNode> s = new Stack<>();
     RegexNode node = root;
@@ -67,6 +70,7 @@ public class Graph {
 
   public void graphAFD(FSM automaton, String fileName) throws IOException {
     String route = "AFD_201801178/";
+    rt.exec("mkdir -p " + route);
     String str = "";
     FileWriter fw
       = new FileWriter(String.format(route + "%s.dot", fileName));
@@ -80,13 +84,13 @@ public class Graph {
       for (String symbol : transition.keySet()) {
         destination = transition.get(symbol);
         str += String.format(
-          "%d -> %d[label=\"%s\"];\n",
+          "S%d -> S%d[label=\"%s\"];\n",
           origin,
           destination,
           symbol
         );
         if (automaton.validationStates.contains(destination)) {
-          str += String.format("%d[shape=\"doublecircle\"];\n", destination);
+          str += String.format("S%d[shape=\"doublecircle\"];\n", destination);
         }
       }
       fw.write(str);
@@ -102,6 +106,7 @@ public class Graph {
     HashMap<Integer, String> symbols,
     String fileName) throws IOException {
     String route = "SIGUIENTES_201801178/";
+    rt.exec("mkdir -p " + route);
     String str = "";
     FileWriter fw
       = new FileWriter(String.format(route + "%s.dot", fileName));
@@ -126,8 +131,44 @@ public class Graph {
     this.execGraphviz(route, fileName);
   }
 
+  public void graphTransitionTable(FSM automaton, HashMap<Integer, String> symbols, String fileName) throws IOException {
+    String route = "TRANSICIONES_201801178/";
+    rt.exec("mkdir -p " + route);
+    FileWriter fw = new FileWriter(route + String.format("%s.dot", fileName));
+    fw.write("digraph G {\n");
+    fw.write("node[shape=plaintext];\n");
+    fw.write("table[label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\n");
+    String str = String.format("<TR><TD ROWSPAN=\"2\">Estado</TD><TD COLSPAN=\"%d\">Terminales</TD></TR>", symbols.size());
+    fw.write(str);
+    str = "<TR>\n";
+    for (String symbol : symbols.values()) {
+      str += String.format("<TD>%s</TD>\n", symbol);
+    }
+    fw.write(str+"</TR>\n");
+    str = "";
+    for (int state : automaton.transitionTable.keySet()) {
+      str += "<TR>\n";
+      String stateArray = Arrays.toString(automaton.dStates.get(state).list.toArray());
+      str += String.format("<TD>S%d %s</TD>\n",state,stateArray);
+      for (String symbol : symbols.values()) {
+        HashMap<String, Integer> transition = automaton.transitionTable.get(state);
+        if (transition.get(symbol) == null) {
+          str += "<TD>--</TD>\n";
+        }
+        else {
+          str += String.format("<TD>S%d</TD>\n",transition.get(symbol));
+        }
+      }
+      str += "</TR>\n";
+      fw.write(str);
+      str = "";
+    }
+    fw.write("</TABLE>>];\n}");
+    fw.close();
+    this.execGraphviz(route, fileName);
+  }
+
   private void execGraphviz(String route, String fileName) throws IOException {
-    Runtime rt = Runtime.getRuntime();
     String[] cmd = {
       "dot",
       route + fileName + ".dot",

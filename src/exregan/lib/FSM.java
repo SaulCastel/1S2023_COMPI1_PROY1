@@ -11,11 +11,13 @@ import java.util.LinkedList;
  * @author saulc
  */
 public class FSM {
+  LinkedList<Dstate> dStates;
   HashMap<Integer, HashMap> transitionTable; 
   LinkedList<Integer> validationStates;
   int state;
 
-  public FSM(HashMap<Integer, HashMap> table, LinkedList<Integer> validationStates) {
+  public FSM(LinkedList<Dstate> dStates, HashMap<Integer, HashMap> table, LinkedList<Integer> validationStates) {
+    this.dStates = dStates;
     this.transitionTable = table;
     this.validationStates = validationStates;
     this.state = 0;
