@@ -22,16 +22,4 @@ public class FSM {
     this.validationStates = validationStates;
     this.state = 0;
   }
-  
-  public boolean scan(String str){
-    char c;
-    HashMap<String, Integer> transition;
-    String symbol;
-    int destination;
-    for (int i = 0; i < str.length()-1;i++){
-      c = str.charAt(i);
-      transition = this.transitionTable.get(state);
-    }  
-    return false;
-  }
 }

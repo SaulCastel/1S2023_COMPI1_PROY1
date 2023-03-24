@@ -227,7 +227,7 @@ public class Parser extends java_cup.runtime.lr_parser {
   int nodeID = 1;
   HashMap<Integer, String> symbols = new HashMap<>();
   HashMap<Integer, LinkedList> nextTable = new HashMap<>();
-  HashMap<String, FSM> automata = new HashMap<>();
+  public HashMap<String, FSM> automata = new HashMap<>();
   FiniteStateMachine generator = new FiniteStateMachine();
   Graph graph = new Graph();
 

@@ -7,6 +7,7 @@ package exregan.gui;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import parser.Lexer;
 import parser.Parser;
@@ -17,6 +18,7 @@ import parser.Parser;
  */
 public class ExreganGUI extends javax.swing.JFrame {
 
+  Parser parser;
   /**
    * Creates new form ExreganGUI
    */
@@ -48,12 +50,12 @@ public class ExreganGUI extends javax.swing.JFrame {
     fileMenu = new javax.swing.JMenu();
     openMenuItem = new javax.swing.JMenuItem();
     jMenu2 = new javax.swing.JMenu();
-    fsmGenMenu = new javax.swing.JMenuItem();
+    fsmGenMenuItem = new javax.swing.JMenuItem();
     jMenu3 = new javax.swing.JMenu();
-    jMenuItem4 = new javax.swing.JMenuItem();
-    jMenuItem5 = new javax.swing.JMenuItem();
-    jMenuItem6 = new javax.swing.JMenuItem();
-    jMenuItem7 = new javax.swing.JMenuItem();
+    treeMenuItem = new javax.swing.JMenuItem();
+    fsmMenuItem = new javax.swing.JMenuItem();
+    nexTableMenuItem = new javax.swing.JMenuItem();
+    transitionsMenuItem = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -143,29 +145,49 @@ public class ExreganGUI extends javax.swing.JFrame {
 
     jMenu2.setText("Ejecutar");
 
-    fsmGenMenu.setText("Generar automata");
-    fsmGenMenu.addActionListener(new java.awt.event.ActionListener() {
+    fsmGenMenuItem.setText("Generar automata");
+    fsmGenMenuItem.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        fsmGenMenuActionPerformed(evt);
+        fsmGenMenuItemActionPerformed(evt);
       }
     });
-    jMenu2.add(fsmGenMenu);
+    jMenu2.add(fsmGenMenuItem);
 
     jMenuBar1.add(jMenu2);
 
     jMenu3.setText("Reportes");
 
-    jMenuItem4.setText("Arbol");
-    jMenu3.add(jMenuItem4);
+    treeMenuItem.setText("Arbol");
+    treeMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        treeMenuItemActionPerformed(evt);
+      }
+    });
+    jMenu3.add(treeMenuItem);
 
-    jMenuItem5.setText("AFD");
-    jMenu3.add(jMenuItem5);
+    fsmMenuItem.setText("AFD");
+    fsmMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        fsmMenuItemActionPerformed(evt);
+      }
+    });
+    jMenu3.add(fsmMenuItem);
 
-    jMenuItem6.setText("Siguientes");
-    jMenu3.add(jMenuItem6);
+    nexTableMenuItem.setText("Siguientes");
+    nexTableMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        nexTableMenuItemActionPerformed(evt);
+      }
+    });
+    jMenu3.add(nexTableMenuItem);
 
-    jMenuItem7.setText("Transiciones");
-    jMenu3.add(jMenuItem7);
+    transitionsMenuItem.setText("Transiciones");
+    transitionsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        transitionsMenuItemActionPerformed(evt);
+      }
+    });
+    jMenu3.add(transitionsMenuItem);
 
     jMenuBar1.add(jMenu3);
 
@@ -207,16 +229,48 @@ public class ExreganGUI extends javax.swing.JFrame {
     }
   }//GEN-LAST:event_openMenuItemActionPerformed
 
-  private void fsmGenMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fsmGenMenuActionPerformed
+  private void fsmGenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fsmGenMenuItemActionPerformed
     try {
-      Lexer s = new Lexer(new java.io.StringReader(editorArea.getText()));
-      Parser p = new Parser(s);
-      p.parse();
-      consoleArea.append("$ Archivo termniado de analizar\n");
+      Lexer lexer = new Lexer(new java.io.StringReader(editorArea.getText()));
+      this.parser = new Parser(lexer);
+      parser.parse();
+      consoleArea.append("$ Archivo terminado de analizar\n");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
-  }//GEN-LAST:event_fsmGenMenuActionPerformed
+    regexComboBox.removeAllItems();
+    for (String regex : this.parser.automata.keySet()) {
+      regexComboBox.addItem(regex);
+    }
+  }//GEN-LAST:event_fsmGenMenuItemActionPerformed
+
+  private void treeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_treeMenuItemActionPerformed
+    String route = "ARBOLES_201801178/";
+    String fileName = (String)regexComboBox.getSelectedItem();
+    ImageIcon image = new ImageIcon(String.format(route + "%s.jpg", fileName));
+    reportLabel.setIcon(image);
+  }//GEN-LAST:event_treeMenuItemActionPerformed
+
+  private void fsmMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fsmMenuItemActionPerformed
+    String route = "AFD_201801178/";
+    String fileName = (String)regexComboBox.getSelectedItem();
+    ImageIcon image = new ImageIcon(String.format(route + "%s.jpg", fileName));
+    reportLabel.setIcon(image);
+  }//GEN-LAST:event_fsmMenuItemActionPerformed
+
+  private void nexTableMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nexTableMenuItemActionPerformed
+    String route = "SIGUIENTES_201801178/";
+    String fileName = (String)regexComboBox.getSelectedItem();
+    ImageIcon image = new ImageIcon(String.format(route + "%s.jpg", fileName));
+    reportLabel.setIcon(image);
+  }//GEN-LAST:event_nexTableMenuItemActionPerformed
+
+  private void transitionsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transitionsMenuItemActionPerformed
+    String route = "TRANSICIONES_201801178/";
+    String fileName = (String)regexComboBox.getSelectedItem();
+    ImageIcon image = new ImageIcon(String.format(route + "%s.jpg", fileName));
+    reportLabel.setIcon(image);
+  }//GEN-LAST:event_transitionsMenuItemActionPerformed
 
   /**
    * @param args the command line arguments
@@ -257,23 +311,23 @@ public class ExreganGUI extends javax.swing.JFrame {
   private javax.swing.JTextArea consoleArea;
   private javax.swing.JTextArea editorArea;
   private javax.swing.JMenu fileMenu;
-  private javax.swing.JMenuItem fsmGenMenu;
+  private javax.swing.JMenuItem fsmGenMenuItem;
+  private javax.swing.JMenuItem fsmMenuItem;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenu jMenu3;
   private javax.swing.JMenuBar jMenuBar1;
-  private javax.swing.JMenuItem jMenuItem4;
-  private javax.swing.JMenuItem jMenuItem5;
-  private javax.swing.JMenuItem jMenuItem6;
-  private javax.swing.JMenuItem jMenuItem7;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JMenuItem nexTableMenuItem;
   private javax.swing.JMenuItem openMenuItem;
   private javax.swing.JComboBox<String> regexComboBox;
   private javax.swing.JLabel reportLabel;
+  private javax.swing.JMenuItem transitionsMenuItem;
+  private javax.swing.JMenuItem treeMenuItem;
   // End of variables declaration//GEN-END:variables
 }
