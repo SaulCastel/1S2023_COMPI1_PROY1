@@ -3,7 +3,7 @@ import java_cup.runtime.Symbol;
 
 %%
 
-%class Scanner
+%class Lexer
 %cup
 %public
 %line
